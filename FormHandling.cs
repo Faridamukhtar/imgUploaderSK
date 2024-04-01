@@ -46,7 +46,7 @@ public class FormHandling
         return img;
     };
 
-    public Func<ImgDetails, IWebHostEnvironment Task<string>> HandleJsonCreation = async (image, env) =>
+    public Func<ImgDetails, IWebHostEnvironment, Task<string>> HandleJsonCreation = async (image, env) =>
     {
         var jsonPath = Path.Combine(env.ContentRootPath, "images.json");
         List<ImgDetails> imageList;
@@ -54,17 +54,19 @@ public class FormHandling
         if (File.Exists(jsonPath))
         {
             var json = await File.ReadAllTextAsync(jsonPath);
-            if (json is not null)
-            {
-                imageList = JsonSerializer.Deserialize<List<ImgDetails>>(json)
-                ?? new List<ImgDetails>();
-            }
-            else
-            {
-                imageList = new List<ImgDetails>();
-            }
-            return jsonPath;
+            imageList = JsonSerializer.Deserialize<List<ImgDetails>>(json)
+            ?? new List<ImgDetails>();
         }
+        else
+        {
+            imageList = new List<ImgDetails>();
+        }
+
+        imageList.Add(image);
+
+        await File.WriteAllTextAsync(jsonPath, JsonSerializer.Serialize(imageList));
+
+        return jsonPath;
     };
 };
 
