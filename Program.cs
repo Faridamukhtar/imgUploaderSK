@@ -66,13 +66,13 @@ app.MapPost("/upload", async (
     }
 });
 
-app.MapGet("/picture/{Id:string}", async ([FromRoute] string Id) =>
+app.MapGet("/picture/{Id}", async ([FromRoute] string Id, IWebHostEnvironment env) =>
 {
     try
     {
         HelperFunctions helperFunctions = new HelperFunctions();
 
-        ImgDetails img = await helperFunctions.GetImageDetailsFromJson(Id);
+        ImgDetails img = await helperFunctions.GetImageDetailsFromJson(Id, env);
 
         var html = $@"
         <html>

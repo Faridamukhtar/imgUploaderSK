@@ -3,9 +3,6 @@ using System.Text.Json;
 
 public class HelperFunctions
 {
-    public static readonly string jsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "images.json");
-    public static readonly string imageFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "UploadedImages");
-
 
     public Func<IFormFile, bool> IsValidFile = (file) =>
     {
@@ -20,6 +17,8 @@ public class HelperFunctions
 
     public Func<IFormFile, IWebHostEnvironment, Task<string>> HandleImageUpload = async (file, env) =>
     {
+        var imageFolder = Path.Combine(env.ContentRootPath, "UploadedImages");
+
         if (!Directory.Exists(imageFolder))
             Directory.CreateDirectory(imageFolder);
 
@@ -48,6 +47,8 @@ public class HelperFunctions
     {
         List<ImgDetails> imageList;
 
+        var jsonPath = Path.Combine(env.ContentRootPath, "images.json");
+
         if (File.Exists(jsonPath))
         {
             var json = await File.ReadAllTextAsync(jsonPath);
@@ -66,8 +67,9 @@ public class HelperFunctions
         return jsonPath;
     };
 
-    public Func<string, Task<ImgDetails>> GetImageDetailsFromJson = async (id) =>
+    public Func<string, IWebHostEnvironment, Task<ImgDetails>> GetImageDetailsFromJson = async (id, env) =>
     {
+        var jsonPath = Path.Combine(env.ContentRootPath, "images.json");
         var json = await File.ReadAllTextAsync(jsonPath);
         var imageList = JsonSerializer.Deserialize<List<ImgDetails>>(json)
         ?? throw new Exception("Empty Json File");
