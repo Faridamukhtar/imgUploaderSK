@@ -1,12 +1,11 @@
 ﻿
 using System.Text.Json;
 
-public class FormHandling
+public class HelperFunctions
 {
-    public FormHandling()
-    {
+    public static readonly string jsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "images.json");
+    public static readonly string imageFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "UploadedImages");
 
-    }
 
     public Func<IFormFile, bool> IsValidFile = (file) =>
     {
@@ -21,11 +20,10 @@ public class FormHandling
 
     public Func<IFormFile, IWebHostEnvironment, Task<string>> HandleImageUpload = async (file, env) =>
     {
-        var folder = Path.Combine(env.ContentRootPath, "UploadedImages");
-        if (!Directory.Exists(folder))
-            Directory.CreateDirectory(folder);
+        if (!Directory.Exists(imageFolder))
+            Directory.CreateDirectory(imageFolder);
 
-        var path = Path.Combine(folder, file.FileName);
+        var path = Path.Combine(imageFolder, file.FileName);
         Console.WriteLine(path);
         using var stream = System.IO.File.OpenWrite(path);
         await file.CopyToAsync(stream);
@@ -48,7 +46,6 @@ public class FormHandling
 
     public Func<ImgDetails, IWebHostEnvironment, Task<string>> HandleJsonCreation = async (image, env) =>
     {
-        var jsonPath = Path.Combine(env.ContentRootPath, "images.json");
         List<ImgDetails> imageList;
 
         if (File.Exists(jsonPath))
@@ -67,6 +64,24 @@ public class FormHandling
         await File.WriteAllTextAsync(jsonPath, JsonSerializer.Serialize(imageList));
 
         return jsonPath;
+    };
+
+    public Func<string, Task<ImgDetails>> GetImageDetailsFromJson = async (id) =>
+    {
+        var json = await File.ReadAllTextAsync(jsonPath);
+        var imageList = JsonSerializer.Deserialize<List<ImgDetails>>(json)
+        ?? throw new Exception("Empty Json File");
+
+        foreach (ImgDetails image in imageList)
+        {
+            if (image.Id == id)
+            {
+                return image;
+            }
+        }
+
+        throw new Exception("Image Not Found");
+
     };
 };
 
