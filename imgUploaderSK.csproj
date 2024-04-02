@@ -13,12 +13,6 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.3" />
   </ItemGroup>
   <ItemGroup>
-    <None Remove="UploadedImages\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="UploadedImages\" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Update="ImgClass.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>

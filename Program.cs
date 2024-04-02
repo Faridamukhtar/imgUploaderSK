@@ -55,8 +55,7 @@ app.MapPost("/upload", async (
             return Results.BadRequest("Invalid File");
         }
 
-        var path = await helperFunctions.HandleImageUpload(file, env);
-        ImgDetails img = helperFunctions.HandleImageObjectCreation(title, path);
+        var img = await helperFunctions.HandleImageUpload(file, env, title);
         var json = await helperFunctions.HandleJsonCreation(img, env);
         return Results.Redirect($"picture/{img.Id}");
     }

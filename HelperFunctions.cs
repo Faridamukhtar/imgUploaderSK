@@ -15,33 +15,30 @@ public class HelperFunctions
         return fileExtension == ".jpeg" || fileExtension == ".jpg" || fileExtension == ".png" || fileExtension == ".gif";
     };
 
-    public Func<IFormFile, IWebHostEnvironment, Task<string>> HandleImageUpload = async (file, env) =>
+    public Func<IFormFile, IWebHostEnvironment, string, Task<ImgDetails>> HandleImageUpload = async (file, env, title) =>
     {
         var imageFolder = Path.Combine(env.ContentRootPath, "UploadedImages");
 
         if (!Directory.Exists(imageFolder))
             Directory.CreateDirectory(imageFolder);
 
-        var path = Path.Combine(imageFolder, file.FileName);
+        var id = Guid.NewGuid().ToString();
+
+        var path = Path.Combine(imageFolder, id + Path.GetExtension(file.FileName));
         Console.WriteLine(path);
         using var stream = System.IO.File.OpenWrite(path);
         await file.CopyToAsync(stream);
-        return path;
-    };
-
-    public Func<string, string, ImgDetails> HandleImageObjectCreation = (title, path) =>
-    {
-        var id = Guid.NewGuid().ToString();
 
         ImgDetails img = new ImgDetails
         {
             Id = id,
             Title = title,
-            Path = path,
+            Path = "/UploadedImages/" + id + Path.GetExtension(file.FileName)
         };
 
         return img;
     };
+
 
     public Func<ImgDetails, IWebHostEnvironment, Task<string>> HandleJsonCreation = async (image, env) =>
     {
