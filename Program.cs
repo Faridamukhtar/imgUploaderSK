@@ -5,7 +5,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAntiforgery();
 WebApplication app = builder.Build();
 app.UseAntiforgery();
+HelperFunctions helperFunctions = new HelperFunctions();
 
+//Image form (landing page)
 app.MapGet("/", (HttpContext context, IAntiforgery antiforgery) =>
 {
     var token = antiforgery.GetAndStoreTokens(context);
@@ -32,6 +34,7 @@ app.MapGet("/", (HttpContext context, IAntiforgery antiforgery) =>
     return Results.Content(html, "text/html");
 });
 
+//Uploading submitted image
 app.MapPost("/upload", async (
     IFormFile file,
     [FromForm] string title,
@@ -42,9 +45,6 @@ app.MapPost("/upload", async (
 {
     try
     {
-
-        HelperFunctions helperFunctions = new HelperFunctions();
-
         await antiforgery.ValidateRequestAsync(context);
 
         if (!helperFunctions.IsValidExtension(file.FileName))
@@ -65,12 +65,11 @@ app.MapPost("/upload", async (
     }
 });
 
+//Post-Submit Redirection page
 app.MapGet("/picture/{Id}", async ([FromRoute] string Id, IWebHostEnvironment env) =>
 {
     try
     {
-        HelperFunctions helperFunctions = new HelperFunctions();
-
         ImgDetails img = await helperFunctions.GetImageDetailsFromJson(Id, env);
 
         var html = $@"
@@ -95,5 +94,32 @@ app.MapGet("/picture/{Id}", async ([FromRoute] string Id, IWebHostEnvironment en
     }
 
 });
+
+//Get Image from UploadedImages Folder (Endpoint)
+app.MapGet("/UploadedImages/{Id}", async ([FromRoute] string Id, IWebHostEnvironment env) =>
+{
+    ImgDetails img = await helperFunctions.GetImageDetailsFromJson(Id, env);
+    var imagePath = img.Path + img.Extension;
+
+    if (File.Exists(imagePath))
+    {
+        try
+        {
+            FileStream file = File.OpenRead(imagePath);
+            return Results.File(file, img.Extension);
+        }
+        catch(Exception ex)
+        {
+            return Results.BadRequest("Error opening file");
+        }
+    }
+    else
+    {
+        return Results.NotFound();
+    }
+
+
+});
+
 
 app.Run();

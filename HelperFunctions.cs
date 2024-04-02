@@ -33,7 +33,8 @@ public class HelperFunctions
         {
             Id = id,
             Title = title,
-            Path = "/UploadedImages/" + id + Path.GetExtension(file.FileName)
+            Path = Path.Combine("UploadedImages", id),
+            Extension = Path.GetExtension(file.FileName)
         };
 
         return img;
@@ -58,7 +59,7 @@ public class HelperFunctions
         }
 
         imageList.Add(image);
-
+         
         await File.WriteAllTextAsync(jsonPath, JsonSerializer.Serialize(imageList));
 
         return jsonPath;
