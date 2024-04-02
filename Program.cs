@@ -80,7 +80,7 @@ app.MapGet("/picture/{Id}", async ([FromRoute] string Id, IWebHostEnvironment en
         <body>
             <div class=""container"">
                 <h1>{img.Title}</h1>
-                <img class=""img-fluid"" src=""{img.Path}"" alt=""{img.Title}"">
+                <img class=""img-fluid"" src=""/{img.Path}"" alt=""{img.Title}"">
 
             </div>
         </body>
@@ -110,7 +110,7 @@ app.MapGet("/UploadedImages/{Id}", async ([FromRoute] string Id, IWebHostEnviron
         }
         catch(Exception ex)
         {
-            return Results.BadRequest("Error opening file");
+            return Results.Problem(ex.Message ?? string.Empty);
         }
     }
     else
