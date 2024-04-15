@@ -4,7 +4,7 @@ using System.Text.Json;
 public class HelperFunctions
 {
 
-    public Func<IFormFile, bool> IsValidFile = (file) =>
+    public static bool IsValidFile(IFormFile file)
     {
         return file is not null && file.Length > 0;
     };
