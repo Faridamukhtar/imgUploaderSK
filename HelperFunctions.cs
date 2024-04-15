@@ -7,7 +7,7 @@ public class HelperFunctions
     public static bool IsValidFile(IFormFile file)
     {
         return file is not null && file.Length > 0;
-    };
+    }
 
     public Func<string, bool> IsValidExtension = (filename) =>
     {

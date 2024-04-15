@@ -50,7 +50,7 @@ app.MapPost("/upload", async (
         if (!helperFunctions.IsValidExtension(file.FileName))
             return Results.BadRequest("Invalid Extension");
 
-        if (!helperFunctions.IsValidFile(file))
+        if (!HelperFunctions.IsValidFile(file))
         {
             return Results.BadRequest("Invalid File");
         }
