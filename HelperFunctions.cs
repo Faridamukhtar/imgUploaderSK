@@ -9,13 +9,13 @@ public class HelperFunctions
         return file is not null && file.Length > 0;
     }
 
-    public Func<string, bool> IsValidExtension = (filename) =>
+    public static bool IsValidExtension (string filename)
     {
         string fileExtension = Path.GetExtension(filename).ToLower();
         return fileExtension == ".jpeg" || fileExtension == ".jpg" || fileExtension == ".png" || fileExtension == ".gif";
-    };
+    }
 
-    public Func<IFormFile, IWebHostEnvironment, string, Task<ImgDetails>> HandleImageUpload = async (file, env, title) =>
+    public static async Task<ImgDetails> HandleImageUpload (IFormFile file, IWebHostEnvironment env, string title)
     {
         var imageFolder = Path.Combine(env.ContentRootPath, "UploadedImages");
 
@@ -38,10 +38,10 @@ public class HelperFunctions
         };
 
         return img;
-    };
+    }
 
 
-    public Func<ImgDetails, IWebHostEnvironment, Task<string>> HandleJsonCreation = async (image, env) =>
+    public static async Task<string> HandleJsonCreation (ImgDetails image, IWebHostEnvironment env)
     {
         List<ImgDetails> imageList;
 
@@ -63,9 +63,9 @@ public class HelperFunctions
         await File.WriteAllTextAsync(jsonPath, JsonSerializer.Serialize(imageList));
 
         return jsonPath;
-    };
+    }
 
-    public Func<string, IWebHostEnvironment, Task<ImgDetails>> GetImageDetailsFromJson = async (id, env) =>
+    public static async Task<ImgDetails> GetImageDetailsFromJson (string id, IWebHostEnvironment env)
     {
         var jsonPath = Path.Combine(env.ContentRootPath, "images.json");
         var json = await File.ReadAllTextAsync(jsonPath);
@@ -82,6 +82,6 @@ public class HelperFunctions
 
         throw new Exception("Image Not Found");
 
-    };
+    }
 };
 

@@ -5,7 +5,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAntiforgery();
 WebApplication app = builder.Build();
 app.UseAntiforgery();
-HelperFunctions helperFunctions = new HelperFunctions();
 
 //Image form (landing page)
 app.MapGet("/", (HttpContext context, IAntiforgery antiforgery) =>
@@ -47,7 +46,7 @@ app.MapPost("/upload", async (
     {
         await antiforgery.ValidateRequestAsync(context);
 
-        if (!helperFunctions.IsValidExtension(file.FileName))
+        if (!HelperFunctions.IsValidExtension(file.FileName))
             return Results.BadRequest("Invalid Extension");
 
         if (!HelperFunctions.IsValidFile(file))
@@ -55,8 +54,8 @@ app.MapPost("/upload", async (
             return Results.BadRequest("Invalid File");
         }
 
-        var img = await helperFunctions.HandleImageUpload(file, env, title);
-        var json = await helperFunctions.HandleJsonCreation(img, env);
+        var img = await HelperFunctions.HandleImageUpload(file, env, title);
+        var json = await HelperFunctions.HandleJsonCreation(img, env);
         return Results.Redirect($"picture/{img.Id}");
     }
     catch (Exception ex)
@@ -70,7 +69,7 @@ app.MapGet("/picture/{Id}", async ([FromRoute] string Id, IWebHostEnvironment en
 {
     try
     {
-        ImgDetails img = await helperFunctions.GetImageDetailsFromJson(Id, env);
+        ImgDetails img = await HelperFunctions.GetImageDetailsFromJson(Id, env);
 
         var html = $@"
         <html>
@@ -98,7 +97,7 @@ app.MapGet("/picture/{Id}", async ([FromRoute] string Id, IWebHostEnvironment en
 //Get Image from UploadedImages Folder (Endpoint)
 app.MapGet("/UploadedImages/{Id}", async ([FromRoute] string Id, IWebHostEnvironment env) =>
 {
-    ImgDetails img = await helperFunctions.GetImageDetailsFromJson(Id, env);
+    ImgDetails img = await HelperFunctions.GetImageDetailsFromJson(Id, env);
     var imagePath = img.Path + img.Extension;
 
     if (File.Exists(imagePath))
