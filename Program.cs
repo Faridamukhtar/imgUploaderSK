@@ -21,8 +21,8 @@ app.MapGet("/", (HttpContext context, IAntiforgery antiforgery) =>
                 <div class=""alert alert-info mb-3"">You can find the uploaded file in 'uploaded' directory</div>
                 <form action=""/upload"" method=""post"" enctype=""multipart/form-data"">
                     <input name=""{token.FormFieldName}"" type=""hidden"" value=""{token.RequestToken}"" />
-                    <input type=""text"" name=""title"" class=""form-control"" placeholder=""enter image title"" /> <br/><br/>
-                    <input type=""file"" name=""file"" class=""form-control""/>
+                    <input type=""text"" name=""title"" class=""form-control"" placeholder=""enter image title"" required/> <br/><br/>
+                    <input type=""file"" name=""file"" class=""form-control"" required/>
                     <br/>
                     <button type=""submit"" class=""btn btn-primary mt-3"">Upload Image</button>
                 </form>
@@ -46,13 +46,14 @@ app.MapPost("/upload", async (
     {
         await antiforgery.ValidateRequestAsync(context);
 
-        if (!HelperFunctions.IsValidExtension(file.FileName))
-            return Results.BadRequest("Invalid Extension");
-
         if (!HelperFunctions.IsValidFile(file))
         {
             return Results.BadRequest("Invalid File");
         }
+
+        if (!HelperFunctions.IsValidExtension(file.FileName))
+            return Results.BadRequest("Invalid Extension");
+
 
         var img = await HelperFunctions.HandleImageUpload(file, env, title);
         var json = await HelperFunctions.HandleJsonCreation(img, env);
